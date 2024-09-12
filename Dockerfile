@@ -43,10 +43,26 @@ RUN	groupadd --gid ${USER} steam && \
 		--gid ${USER} \
 		--uid ${USER} \
 		steam && \
-	mkdir -p ${STEAMCMDDIR} ${STEAMAPPDIR} /Config /Logs /Scripts && \
+	mkdir -p ${STEAMCMDDIR} ${STEAMAPPDIR} /Config /Logs /Scripts /Libraries /rml_libs /rml_mods && \
 	cd ${STEAMCMDDIR} && \
 	curl -sqL ${STEAMCMDURL} | tar zxfv - && \
-	chown -R ${USER}:${USER} ${STEAMCMDDIR} ${STEAMAPPDIR} /Config /Logs
+	chown -R ${USER}:${USER} ${STEAMCMDDIR} ${STEAMAPPDIR} /Config /Logs /Scripts /Libraries /rml_libs /rml_mods
+
+#install mods
+RUN wget -P ${STEAMAPPDIR}/Libraries https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/ResoniteModLoader.dll \
+	wget -P ${STEAMAPPDIR}/rml_libs https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/0Harmony-Net8.dll \
+	wget -P ${STEAMAPPDIR}/rml_mods https://github.com/Raidriar796/StresslessHeadless/releases/latest/download/StresslessHeadless.dll \
+	wget -P ${STEAMAPPDIR}/rml_mods https://github.com/BlueCyro/Outflow/releases/latest/download/Outflow.dll \
+	wget -P ${STEAMAPPDIR}/rml_mods https://github.com/Raidriar796/StresslessHeadless/releases/latest/download/StresslessHeadless.dll\
+	#fake dot net project
+	dotnet new console -n Temp -o ${STEAMAPPDIR}/Temp
+
+
+	wget -P ${STEAMAPPDIR}/rml_libs https://raw.githubusercontent.com/resonite-modding-group/ExampleMod/9c15387ae420eb9002465446164a46257ceeb48b/ExampleMod.sln \
+	wget -P ${STEAMAPPDIR}/rml_libs https://www.nuget.org/api/v2/package/Discord.Net.Webhook/3.15.3 \
+	wget -P ${STEAMAPPDIR}/rml_libs 
+	
+
 
 COPY	--chown=${USER}:${USER} --chmod=755 ./src/setup_resonite.sh ./src/start_resonite.sh /Scripts/
 
