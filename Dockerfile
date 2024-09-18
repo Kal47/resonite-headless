@@ -17,7 +17,7 @@ ENV	STEAMAPPDIR="${HOMEDIR}/${STEAMAPP}-headless"
 RUN	set -x && \
 	apt -y update && \
 	apt -y upgrade && \
-	apt -y install curl lib32gcc-s1 libopus-dev libopus0 opus-tools libc6-dev dotnet-runtime-8.0 && \
+	apt -y install curl lib32gcc-s1 libopus-dev libopus0 opus-tools libc6-dev dotnet-runtime-8.0 wget && \
 	rm -rf /var/lib/{apt,dpkg,cache}
 
 # Add locales
@@ -29,7 +29,7 @@ RUN	apt-get update && \
 	update-locale LANG=en_US.UTF-8 && \
 	update-locale LANG=en_GB.UTF-8 && \
 	rm -rf /var/lib/{apt,dpkg,cache}
-ENV	LANG en_GB.UTF-8
+ENV	LANG=en_GB.UTF-8
 
 # Fix the LetsEncrypt CA cert (is this still needed?)
 #RUN	sed -i 's#mozilla/DST_Root_CA_X3.crt#!mozilla/DST_Root_CA_X3.crt#' /etc/ca-certificates.conf && update-ca-certificates
@@ -49,32 +49,24 @@ RUN	groupadd --gid ${USER} steam && \
 	chown -R ${USER}:${USER} ${STEAMCMDDIR} ${STEAMAPPDIR} /Config /Logs /Scripts /Libraries /rml_libs /rml_mods
 
 #install mods
-RUN wget -P ${STEAMAPPDIR}/Libraries https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/ResoniteModLoader.dll \
-	wget -P ${STEAMAPPDIR}/rml_libs https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/0Harmony-Net8.dll \
-	wget -P ${STEAMAPPDIR}/rml_mods https://github.com/Raidriar796/StresslessHeadless/releases/latest/download/StresslessHeadless.dll \
-	wget -P ${STEAMAPPDIR}/rml_mods https://github.com/BlueCyro/Outflow/releases/latest/download/Outflow.dll \
-	wget -P ${STEAMAPPDIR}/rml_mods https://github.com/Raidriar796/StresslessHeadless/releases/latest/download/StresslessHeadless.dll\
-	#fake dot net project
-	dotnet new console -n Temp -o ${STEAMAPPDIR}/Temp
-
-
-	wget -P ${STEAMAPPDIR}/rml_libs https://raw.githubusercontent.com/resonite-modding-group/ExampleMod/9c15387ae420eb9002465446164a46257ceeb48b/ExampleMod.sln \
-	wget -P ${STEAMAPPDIR}/rml_libs https://www.nuget.org/api/v2/package/Discord.Net.Webhook/3.15.3 \
-	wget -P ${STEAMAPPDIR}/rml_libs 
-	
-
+RUN wget -P ${STEAMAPPDIR}/Libraries https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/ResoniteModLoader.dll 
+RUN	wget -P ${STEAMAPPDIR}/rml_libs https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/0Harmony-Net8.dll 
+RUN	wget -P ${STEAMAPPDIR}/rml_mods https://github.com/Raidriar796/StresslessHeadless/releases/latest/download/StresslessHeadless.dll 
+RUN	wget -P ${STEAMAPPDIR}/rml_mods https://github.com/BlueCyro/Outflow/releases/latest/download/Outflow.dll 
+RUN	wget -P ${STEAMAPPDIR}/rml_mods https://github.com/Raidriar796/StresslessHeadless/releases/latest/download/StresslessHeadless.dll 
 
 COPY	--chown=${USER}:${USER} --chmod=755 ./src/setup_resonite.sh ./src/start_resonite.sh /Scripts/
 
-#RUN	chown -R ${USER}:${USER} /Scripts/setup_resonite.sh /Scripts/start_resonite.sh && \
-#	chmod +x /Scripts/setup_resonite.sh /Scripts/start_resonite.sh
+
+RUN	chown -R ${USER}:${USER} /Scripts/setup_resonite.sh /Scripts/start_resonite.sh && \
+	chmod +x /Scripts/setup_resonite.sh /Scripts/start_resonite.sh
 
 # Switch to user
 USER	${USER}
 
 WORKDIR	${STEAMAPPDIR}
 
-VOLUME ["${STEAMAPPDIR}", "/Config", "/Logs"]
+VOLUME ["${STEAMAPPDIR}", "/Config", "/Logs", "Libraies", "rml_mods", "rml_libs"]
 
 STOPSIGNAL SIGINT
 

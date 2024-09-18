@@ -1,7 +1,7 @@
 version: "3.3"
 services:
   resonite:
-    image: shadowpanther/resonite-headless:latest
+    image: kal47/resonite-headless:latest
     container_name: resonite-headless
     tty: true
     stdin_open: true
@@ -13,6 +13,9 @@ services:
       - resonite-data:/home/steam/resonite-headless
       - ./Config:/Config:ro
       - ./Logs:/Logs
+      - ./Libraries:/Libraries
+      - ./rml_libs:/rml_libs
+      - ./rml_mods:/rml_mods
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
 volumes:
