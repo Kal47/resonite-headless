@@ -1,12 +1,22 @@
+version: "3.4"
 services:
-  app:
-    entrypoint:
-    - sleep
-    - infinity
-    image: docker/dev-environments-default:stable-1
-    init: true
+  resonite:
+    image: kal47/resonite-headless-modded:latest
+    container_name: resonite-headless-modded
+    tty: true
+    stdin_open: true
+    environment:
+      STEAMBETA: headless
+      STEAMBETAPASSWORD: CHANGEME
+      STEAMLOGIN: "USER PASSWORD"
     volumes:
-    - type: bind
-      source: /var/run/docker.sock
-      target: /var/run/docker.sock
-
+      - resonite-data:/home/steam/resonite-headless
+      - ./Config:/Config:ro
+      - ./Logs:/Logs
+      - ./Libraries:/Libraries
+      - ./rml_libs:/rml_libs
+      - ./rml_mods:/rml_mods
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+volumes:
+  resonite-data:

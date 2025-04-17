@@ -1,8 +1,8 @@
-version: "3.3"
+version: "3.4"
 services:
   resonite:
-    image: kal47/resonite-headless:latest
-    container_name: resonite-headless
+    image: kal47/resonite-headless-modded:latest
+    container_name: resonite-headless-modded
     tty: true
     stdin_open: true
     environment:
@@ -12,10 +12,10 @@ services:
     volumes:
       - resonite-data:/home/steam/resonite-headless
       - ./Config:/Config:ro
-      - ./Logs:/Logs
-      - ./Libraries:/Libraries
-      - ./rml_libs:/rml_libs
-      - ./rml_mods:/rml_mods
+      - ./Logs:/Logs:rw
+      - ./Libraries:/Libraries:ro
+      - ./rml_libs:/rml_libs:ro
+      - ./rml_mods:/rml_mods:ro
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
 volumes:

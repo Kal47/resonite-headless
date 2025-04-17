@@ -1,5 +1,5 @@
-# resonite-headless
-Docker image of a Resonite headless server
+# resonite-headless-modded
+Docker image of a Resonite headless server that includes modding support out of the box!
 
 Send the command `/headlessCode` to **Resonite** bot (the one that sends you messages about Patreon and storage) in Resonite to get the beta key.
 
@@ -21,7 +21,10 @@ services:
     volumes:
       - resonite-data:/home/steam/resonite-headless
       - ./Config:/Config:ro
-      - ./Logs:/Logs
+      - ./Logs:/Logs:rw
+      - ./Libraies:/Libraies:ro
+      - ./rml_mods:/rmlmods:ro
+      - ./rml_libs:/rml_libs:ro
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
 volumes:
@@ -31,3 +34,7 @@ volumes:
 Place your `Config.json` into `Config` folder. Logs would be stored in `Logs` folder.
 
 You probably need to set `vm.max_map_count=262144` by doing `echo "vm.max_map_count=262144" >> /etc/sysctl.conf` lest you end up with frequent GC crashes.
+
+### Modding
+ 
+Install mods like you would the client. 

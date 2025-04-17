@@ -1,4 +1,4 @@
-FROM	ubuntu
+FROM	ubuntu:oracular
 
 LABEL	name=resonite-headless org.opencontainers.image.authors="panther.ru@gmail.com"
 
@@ -17,7 +17,7 @@ ENV	STEAMAPPDIR="${HOMEDIR}/${STEAMAPP}-headless"
 RUN	set -x && \
 	apt -y update && \
 	apt -y upgrade && \
-	apt -y install curl lib32gcc-s1 libopus-dev libopus0 opus-tools libc6-dev dotnet-runtime-8.0 wget && \
+	apt -y install curl lib32gcc-s1 libopus-dev libopus0 opus-tools libc6-dev libfreetype6 dotnet-runtime-9.0 wget && \
 	rm -rf /var/lib/{apt,dpkg,cache}
 
 # Add locales
@@ -29,7 +29,7 @@ RUN	apt-get update && \
 	update-locale LANG=en_US.UTF-8 && \
 	update-locale LANG=en_GB.UTF-8 && \
 	rm -rf /var/lib/{apt,dpkg,cache}
-ENV	LANG=en_GB.UTF-8
+ENV	LANG en_GB.UTF-8
 
 # Fix the LetsEncrypt CA cert (is this still needed?)
 #RUN	sed -i 's#mozilla/DST_Root_CA_X3.crt#!mozilla/DST_Root_CA_X3.crt#' /etc/ca-certificates.conf && update-ca-certificates
@@ -48,12 +48,14 @@ RUN	groupadd --gid ${USER} steam && \
 	curl -sqL ${STEAMCMDURL} | tar zxfv - && \
 	chown -R ${USER}:${USER} ${STEAMCMDDIR} ${STEAMAPPDIR} /Config /Logs /Scripts /Libraries /rml_libs /rml_mods
 
-#install mods
+#install modloader
 RUN wget -P ${STEAMAPPDIR}/Libraries https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/ResoniteModLoader.dll 
 RUN	wget -P ${STEAMAPPDIR}/rml_libs https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/0Harmony-Net8.dll 
-RUN	wget -P ${STEAMAPPDIR}/rml_mods https://github.com/Raidriar796/StresslessHeadless/releases/latest/download/StresslessHeadless.dll 
-RUN	wget -P ${STEAMAPPDIR}/rml_mods https://github.com/BlueCyro/Outflow/releases/latest/download/Outflow.dll 
-RUN	wget -P ${STEAMAPPDIR}/rml_mods https://github.com/Raidriar796/StresslessHeadless/releases/latest/download/StresslessHeadless.dll 
+
+#extra mods
+#RUN	wget -P ${STEAMAPPDIR}/rml_mods https://github.com/Raidriar796/StresslessHeadless/releases/latest/download/StresslessHeadless.dll 
+#RUN	wget -P ${STEAMAPPDIR}/rml_mods https://github.com/BlueCyro/Outflow/releases/latest/download/Outflow.dll 
+
 
 COPY	--chown=${USER}:${USER} --chmod=755 ./src/setup_resonite.sh ./src/start_resonite.sh /Scripts/
 
@@ -66,7 +68,7 @@ USER	${USER}
 
 WORKDIR	${STEAMAPPDIR}
 
-VOLUME ["${STEAMAPPDIR}", "/Config", "/Logs", "Libraies", "rml_mods", "rml_libs"]
+VOLUME ["${STEAMAPPDIR}", "/Config", "/Logs", "/Libraies", "/rml_mods", "/rml_libs"]
 
 STOPSIGNAL SIGINT
 
